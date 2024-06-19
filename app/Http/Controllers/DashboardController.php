@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\penjualan;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -11,7 +13,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('dashboard');
+        $today = Carbon::today();
+        $totalSales = penjualan::whereDate('tanggal', $today)->count();
+
+        return view('dashboard', compact('totalSales'));
     }
 
     /**

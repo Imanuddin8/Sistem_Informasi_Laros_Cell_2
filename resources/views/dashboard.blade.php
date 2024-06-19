@@ -63,7 +63,7 @@
                                 class="row justify-content-between align-items-center"
                             >
                                 <div class="col-auto">
-                                    <h4>{{ App\Models\penjualan::count() }}</h4>
+                                    <h4>{{ $totalSales }}</h4>
                                     <p>Transaksi Penjualan</p>
                                 </div>
                                 <div class="col-auto">
