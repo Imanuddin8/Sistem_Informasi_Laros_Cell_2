@@ -44,7 +44,7 @@
                             <td>{{$row->kategori}}</td>
                             <td>Rp {{$row->harga_beli}}</td>
                             <td>Rp {{$row->harga_jual}}</td>
-                            <td>{{$row->stok}}</td>
+                            <td>{{number_format($row->stok, 0, ',', '.')}}</td>
                             <td class="d-flex">
                                 <a href="{{route('produk.edit', ['id' => $row->id])}}" type="button" class="btn btn-icon btn-warning mr-2" name="edit">
                                     <i class="text-white fa fa-edit" aria-hidden="true"></i>

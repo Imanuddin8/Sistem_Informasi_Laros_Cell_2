@@ -29,7 +29,7 @@
                                 class="row justify-content-between align-items-center"
                             >
                                 <div class="col-auto">
-                                    <h4>Rp 1200000000</h4>
+                                    <h4>Rp {{$saldoStok}}</h4>
                                     <p>Jumlah Saldo</p>
                                 </div>
                                 <div class="col-auto">
@@ -64,7 +64,7 @@
                             >
                                 <div class="col-auto">
                                     <h4>{{ $totalSales }}</h4>
-                                    <p>Transaksi Penjualan</p>
+                                    <p>Penjualan Hari Ini</p>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fs-1 fa-solid fa-money-bill" style="color: #228e3b;"></i>

@@ -30,7 +30,6 @@
                         <th>No</th>
                         <th>Nama</th>
                         <th>Username</th>
-                        <th>Password</th>
                         <th>Posisi</th>
                         <th>Aksi</th>
                     </tr>
@@ -41,7 +40,6 @@
                             <td>{{$loop->iteration}}</td>
                             <td>{{$row->nama}}</td>
                             <td>{{$row->username}}</td>
-                            <td>{{$row->password}}</td>
                             <td>{{$row->role}}</td>
                             <td class="d-flex">
                                 <a href="{{route('user.edit', ['id' => $row->id])}}" type="button" class="mr-1 btn btn-icon btn-warning" name="edit">

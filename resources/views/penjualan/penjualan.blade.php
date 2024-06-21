@@ -90,7 +90,7 @@
                         <td>{{$loop->iteration}}</td>
                         <td>{{$row->produk->nama_produk}}</td>
                         <td>{{$row->no}}</td>
-                        <td>{{$row->jumlah}}</td>
+                        <td>{{number_format($row->jumlah, 0, ',', '.')}}</td>
                         <td>Rp {{number_format($row->total, 0, ',', '.')}}</td>
                         <td>{{ formatDate($row->tanggal) }}</td>
                         <td>{{$row->user->username}}</td>

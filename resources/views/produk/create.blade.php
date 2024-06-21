@@ -33,18 +33,18 @@
                                     <label for="exampleFormControlInput1" class="form-label">Harga Jual</label>
                                     <input id="harga_jual" name="harga_jual" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Harga jual produk" required/>
                                 </div>
-                                <div class="mb-3">
+                                <div class="">
                                   <label for="exampleFormControlSelect1" class="form-label">Kategori</label>
                                   <select id="kategori" name="kategori" class="form-control" id="exampleFormControlSelect1" aria-label="Default select example" required>
                                     <option selected>Piih kategori produk</option>
                                     <option value="kartu">Kartu</option>
                                     <option value="saldo">Saldo</option>
                                     <option value="vocher">Vocher</option>
+                                    <option value="aksessoris">Aksessoris</option>
                                   </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="exampleFormControlInput1" class="form-label">Stok</label>
-                                    <input id="stok" name="stok" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Harga produk" required/>
+                                <div class="invisible">
+                                    <input value="0" id="stok" name="stok" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Harga produk" required/>
                                 </div>
                                 <div class="d-flex justify-content-end align-items-center">
                                     <div class="mr-4">
