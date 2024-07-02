@@ -4,7 +4,7 @@
 <section class="content-header">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-12 col-md-8 col-lg-12">
         <h1>Transaksi Penjualan</h1>
         <p>Daftar transaksi penjualan pada Toko Laros Cell</p>
       </div>
@@ -16,7 +16,7 @@
 <section class="content">
 <div class="container-fluid">
   <div class="row">
-    <div class="col-12">
+    <div class="col-12 col-md-8 col-lg-12">
       <div class="card">
         <div class="card-body">
             <div
@@ -98,7 +98,7 @@
                             <a href="{{route('penjualan.edit', ['id' => $row->id])}}" type="button" class="btn btn-icon btn-warning mr-2" name="edit">
                                 <i class="fa fa-edit text-white" aria-hidden="true"></i>
                             </a>
-                            <a href="{{route('penjualan.delete', ['id' => $row->id])}}}" type="button" class="btn btn-icon btn-danger" name="delete" onclick="if(!confirm('Yakin Akan Menghapus?')){return false}">
+                            <a href="{{route('penjualan.delete', ['id' => $row->id])}}}" type="button" class="btn btn-icon btn-danger" name="delete" onclick="if(!confirm('Apakah anda yakin akan Menghapus?')){return false}">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                             </a>
                         </td>

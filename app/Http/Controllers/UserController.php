@@ -53,7 +53,7 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    
+
 
     /**
      * Show the form for editing the specified resource.
@@ -74,12 +74,20 @@ class UserController extends Controller
     {
         if(auth()->user()->role == "admin"){
             $user = User::findOrFail($id);
-            $request = User::where('id', $request->id)->update([
+            // Data yang akan diupdate
+            $updateData = [
                 'nama' => $request->nama,
                 'username' => $request->username,
-                'password' => bcrypt($request->password),
                 'role' => $request->role,
-            ]);
+            ];
+
+            // Jika password diisi, tambahkan ke dalam data yang akan diupdate
+            if ($request->filled('password')) {
+                $updateData['password'] = bcrypt($request->password);
+            }
+
+            // Update user
+            User::where('id', $id)->update($updateData);
 
             return redirect()->route('user')
                 ->with('toast_success', 'user berhasil diperbarui');

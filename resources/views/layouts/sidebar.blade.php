@@ -77,6 +77,7 @@
                 @endif
             </ul>
         </nav>
+        <!-- /.sidebar-menu -->
         <div class="mt-3 d-flex justify-content-center">
             <form id="logout-form" action="{{ url('/logout') }}" method="POST"
                 onsubmit="return confirm('Apakah Anda yakin ingin Logout?')">
@@ -87,7 +88,6 @@
                 </button>
             </form>
         </div>
-        <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
 </aside>

@@ -22,6 +22,7 @@
         "sass-loader": "^11.0.1"
     },
     "dependencies": {
+        "select2": "^4.1.0-rc.0",
         "sweetalert": "^2.1.2",
         "sweetalert2": "^11.11.0"
     }

@@ -22,14 +22,14 @@
             <div
                 class="row justify-content-start align-items-center"
             >
-                <div class="col-lg-3 col-6">
+                <div class="col-lg-3 col-md-6">
                     <div class="small-box bg-info p-1">
                         <div class="inner">
                             <div
                                 class="row justify-content-between align-items-center"
                             >
                                 <div class="col-auto">
-                                    <h4>Rp {{$saldoStok}}</h4>
+                                    <h4>{{ number_format($saldoStok, 0, ',', '.') }}</h4>
                                     <p>Jumlah Saldo</p>
                                 </div>
                                 <div class="col-auto">
@@ -39,14 +39,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-6">
+                <div class="col-lg-3 col-md-6">
                     <div class="small-box bg-warning p-1">
                         <div class="inner">
                             <div
                                 class="row justify-content-between align-items-center"
                             >
                                 <div class="col-auto text-white">
-                                    <h4>{{ App\Models\produk::count() }}</h4>
+                                    <h4>{{ number_format($jumlahProduk, 0, ',', '.') }}</h4>
                                     <p>Jumlah produk</p>
                                 </div>
                                 <div class="col-auto">
@@ -56,14 +56,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-6">
+                <div class="col-lg-3 col-md-6">
                     <div class="small-box bg-success p-1">
                         <div class="inner">
                             <div
                                 class="row justify-content-between align-items-center"
                             >
                                 <div class="col-auto">
-                                    <h4>{{ $totalSales }}</h4>
+                                    <h4>{{ number_format($totalSales, 0, ',', '.') }}</h4>
                                     <p>Penjualan Hari Ini</p>
                                 </div>
                                 <div class="col-auto">
@@ -74,14 +74,14 @@
                     </div>
                 </div>
                 @if (auth()->user()->role == "admin")
-                    <div class="col-lg-3 col-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="small-box bg-danger p-1">
                             <div class="inner">
                                 <div
                                     class="row justify-content-between align-items-center"
                                 >
                                     <div class="col-auto">
-                                        <h4>{{ App\Models\User::count() }}</h4>
+                                        <h4>{{ number_format($jumlahUser, 0, ',', '.') }}</h4>
                                         <p>Jumlah user</p>
                                     </div>
                                     <div class="col-auto">

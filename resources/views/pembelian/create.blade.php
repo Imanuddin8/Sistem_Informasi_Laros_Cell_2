@@ -4,7 +4,7 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2 justify-content-center">
-                <div class="col-6 text-center">
+                <div class="col-12 col-md-8 col-lg-6 text-center">
                     <h1>Tambah Transaksi Pembelian</h1>
                 </div>
             </div>
@@ -15,7 +15,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row justify-content-center">
-                <div class="col-6">
+                <div class="col-12 col-md-8 col-lg-6">
                     <div class="card">
                         <div class="pb-8">
                         </div>
@@ -26,22 +26,20 @@
                                 <div class="mb-3">
                                     <label for="exampleFormControlSelect1" class="form-label">Nama Produk</label>
                                     <select name="produk_id" id="produk_id" class="form-control" id="exampleFormControlSelect1" aria-label="Default select example" required>
-                                      <option selected>Pilih produk</option>
-                                      @foreach ($produk as $ct)
-                                        <option value="{{ $ct->id }}">{{ $ct->nama_produk }}</option>
-                                      @endforeach
+                                        @foreach($produk as $produk)
+                                            <option value="{{ $produk->id }}" {{ old('produk_id') == $produk->id ? 'selected' : '' }}>
+                                                {{ $produk->nama_produk }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="exampleFormControlInput1" class="form-label">Jumlah</label>
-                                    <input name="jumlah" id="jumlah" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Jumlah produk" required/>
+                                    <input name="jumlah" id="jumlah" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Jumlah produk" oninput="formatNumber(this)" required/>
                                 </div>
                                 <div class="mb-3">
                                     <label for="exampleFormControlInput1" class="form-label">Tanggal</label>
                                     <input name="tanggal" id="tanggal" type="date" class="form-control" id="exampleFormControlInput1" required/>
-                                </div>
-                                <div class="invisible">
-                                    <input readonly name="user_id" id="user_id" value="{{ auth()->user()->id}}" type="text" class="form-control" id="exampleFormControlInput1" required/>
                                 </div>
                                 <div class="d-flex justify-content-end align-items-center">
                                     <div class="mr-4">
@@ -61,6 +59,15 @@
             </div>
             <!-- /.row -->
         </div>
+        <script>
+            function formatNumber(input) {
+                // Hapus semua karakter non-digit
+                let value = input.value.replace(/\D/g, '');
+                // Format ulang angka dengan titik ribuan
+                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                input.value = value;
+            }
+        </script>
         <!-- /.container-fluid -->
     </section>
     <!-- /.content -->

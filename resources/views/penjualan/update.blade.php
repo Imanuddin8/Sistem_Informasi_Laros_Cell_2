@@ -4,7 +4,7 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2 justify-content-center">
-                <div class="col-6 text-center">
+                <div class="col-12 col-md-8 col-lg-6 text-center">
                     <h1>Edit Transaksi Penjualan</h1>
                 </div>
             </div>
@@ -15,7 +15,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row justify-content-center">
-                <div class="col-6">
+                <div class="col-12 col-md-8 col-lg-6">
                     <div class="card">
                         <div class="card-header">
                             <form id="form" action="{{ route('penjualan.update', $penjualan->id) }}" method="post"
@@ -37,14 +37,11 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="exampleFormControlInput1" class="form-label">Jumlah</label>
-                                    <input value="{{$penjualan->jumlah}}" name="jumlah" id="jumlah" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Jumlah produk" required/>
+                                    <input value="{{$penjualan->jumlah}}" name="jumlah" id="jumlah" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Jumlah produk" oninput="formatNumber(this)" required/>
                                 </div>
-                                <div>
+                                <div class="mb-3">
                                     <label for="exampleFormControlInput1" class="form-label">Tanggal</label>
                                     <input value="{{$penjualan->tanggal}}" name="tanggal" type="date" class="form-control" id="exampleFormControlInput1" required/>
-                                </div>
-                                <div class="invisible">
-                                  <input readonly name="user_id" id="user_id" value="{{ auth()->user()->id}}" type="text" class="form-control" id="exampleFormControlInput1" required/>
                                 </div>
                                 <div class="d-flex justify-content-end align-items-center gap-2">
                                     <div class="mr-4">
@@ -64,7 +61,17 @@
             </div>
             <!-- /.row -->
         </div>
+        <script>
+            function formatNumber(input) {
+                // Hapus semua karakter non-digit
+                let value = input.value.replace(/\D/g, '');
+                // Format ulang angka dengan titik ribuan
+                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                input.value = value;
+            }
+        </script>
         <!-- /.container-fluid -->
+        @include('sweetalert::alert')
     </section>
     <!-- /.content -->
 @endsection

@@ -18,6 +18,6 @@ class CheckRole
       if(in_array($request->user()->role,$roles)){
         return $next($request);
       }
-      return abort(403, 'Unauthorized action');
+      return redirect('/');
     }
 }

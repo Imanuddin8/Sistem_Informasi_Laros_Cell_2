@@ -14,8 +14,8 @@ class ProdukController extends Controller
      */
     public function index()
     {
-      $produk = produk::orderBy('created_at', 'desc')->get();
-      return view('produk.produk', compact('produk'));
+        $produk = produk::orderBy('created_at', 'desc')->get();
+        return view('produk.produk', compact('produk'));
     }
 
     /**
@@ -32,24 +32,28 @@ class ProdukController extends Controller
      */
     public function store(StoreprodukRequest $request)
     {
-      $request->validate([
-        'nama_produk' => 'required|string|max:255',
-        'harga_beli' => 'required|string|max:255',
-        'harga_jual' => 'required|string|max:255',
-        'kategori' => 'required|string|max:255',
-        'stok' => 'required|numeric',
-      ]);
+        // Hapus titik ribuan dari input jumlah
+        $harga_beli = str_replace('.', '', $request->harga_beli);
+        $harga_jual = str_replace('.', '', $request->harga_jual);
 
-      produk::create($request->all());
+        $stok = $request->kategori === 'saldo' ? Produk::where('nama_produk', 'saldo')->value('stok') : 0;
 
-      return redirect()->route('produk')
-          ->with('toast_success', 'Produk berhasil ditambahkan');
-    }
+        $produk = produk::create([
+            'nama_produk' => $request->nama_produk,
+            'kategori' => $request->kategori,
+            'harga_beli' => $harga_beli,
+            'harga_jual' => $harga_jual,
+            'stok' => $stok,
+        ]);
+
+        return redirect()->route('produk')
+            ->with('toast_success', 'Produk berhasil ditambahkan');
+        }
 
     /**
      * Display the specified resource.
      */
-    
+
 
     /**
      * Show the form for editing the specified resource.
@@ -65,11 +69,35 @@ class ProdukController extends Controller
      */
     public function update(UpdateprodukRequest $request, $id)
     {
-      $produk = produk::findOrFail($id);
-      $produk->update($request->all());
+        $produk = produk::findOrFail($id);
 
-      return redirect()->route('produk')
-          ->with('toast_success', 'Produk berhasil diperbarui');
+        // Hapus titik ribuan dari input jumlah
+        $harga_beli = str_replace('.', '', $request->harga_beli);
+        $harga_jual = str_replace('.', '', $request->harga_jual);
+
+        // Periksa kondisi kategori
+        if ($produk->kategori == 'saldo' && $request->kategori != 'saldo') {
+            // Jika kategori berubah dari 'saldo' menjadi kategori lain
+            $produk->stok = 0;
+        } elseif ($produk->kategori != 'saldo' && $request->kategori == 'saldo') {
+            // Jika kategori berubah menjadi 'saldo', stok diupdate dari produk dengan nama 'saldo'
+            $saldoProduct = produk::where('nama_produk', 'saldo')->first();
+            if ($saldoProduct) {
+                $produk->stok = $saldoProduct->stok;
+            }
+        }
+
+        // Update data produk
+        $produk->update([
+            'nama_produk' => $request->nama_produk,
+            'kategori' => $request->kategori,
+            'harga_beli' => $harga_beli,
+            'harga_jual' => $harga_jual,
+            'stok' => $produk->stok // stok tetap sama jika kategori tidak berubah
+        ]);
+
+        return redirect()->route('produk')
+            ->with('toast_success', 'Produk berhasil diperbarui');
     }
 
     /**
@@ -77,9 +105,9 @@ class ProdukController extends Controller
      */
     public function destroy($id)
     {
-      $produk = produk::findOrFail($id);
-      $produk->delete();
+        $produk = produk::findOrFail($id);
+        $produk->delete();
 
-      return redirect()->route('produk')->with('toast_success', 'Produk berhasil dihapus.');
+        return redirect()->route('produk')->with('toast_success', 'Produk berhasil dihapus.');
     }
 }

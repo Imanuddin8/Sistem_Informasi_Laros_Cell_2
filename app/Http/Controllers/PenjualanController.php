@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Http\Requests\StorepenjualanRequest;
 use App\Http\Requests\UpdatepenjualanRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use PDF;
 
 class PenjualanController extends Controller
@@ -39,25 +40,44 @@ class PenjualanController extends Controller
      */
     public function store(StorepenjualanRequest $request)
     {
-      $produk = produk::all();
-      $user = User::all();
-      $produk = Produk::find($request->produk_id);
+        $produk = produk::all();
+        $user = User::all();
+        $produk = produk::all();
 
-      if ($produk->kategori == 'saldo') {
-          $total = $request->jumlah + '2000';
-      } else {
-          $total = $request->jumlah * $produk->harga_jual;
-      }
+        // Hapus titik ribuan dari input jumlah
+        $jumlah = str_replace('.', '', $request->jumlah);
 
-      $penjualan = penjualan::create([
-        'produk_id' => $request->produk_id,
-        'no' => $request->no,
-        'jumlah' => $request->jumlah,
-        'total' => $total,
-        'tanggal' => $request->tanggal,
-        'user_id' => $request->user_id
-      ]);
-      return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil ditambahkan');
+        // Ambil produk berdasarkan produk_id dari request
+        $selectedProduct = produk::find($request->produk_id);
+
+        // Cek stok produk sebelum melakukan penjualan
+        if ($selectedProduct->stok < $jumlah) {
+            return redirect()->back()->with('toast_error', 'Stok produk tidak mencukupi untuk transaksi ini')->withInput();
+        }
+
+         // Hitung total berdasarkan kategori produk
+        if ($selectedProduct->kategori == 'saldo') {
+            $total = $jumlah + 2000;
+            // Kurangi stok untuk semua produk dengan kategori 'saldo'
+            produk::where('kategori', 'saldo')->decrement('stok', $jumlah);
+        } else {
+            $total = $jumlah * $selectedProduct->harga_jual;
+            // Kurangi stok untuk produk yang bukan kategori 'saldo'
+            $selectedProduct->decrement('stok', $jumlah);
+        }
+
+        // Simpan perubahan stok produk
+        $selectedProduct->save();
+
+        $penjualan = penjualan::create([
+            'produk_id' => $request->produk_id,
+            'no' => $request->no,
+            'jumlah' => $jumlah,
+            'total' => $total,
+            'tanggal' => $request->tanggal,
+            'user_id' => Auth::id()
+        ]);
+        return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil ditambahkan');
     }
 
     /**
@@ -80,26 +100,46 @@ class PenjualanController extends Controller
      */
     public function update(UpdatepenjualanRequest $request, $id)
     {
-      $penjualan = penjualan::findOrFail($id);
-      $user = User::all();
-      $produk = produk::all();
-      $produk = Produk::find($request->produk_id);
+        $penjualan = penjualan::findOrFail($id);
+        $user = User::all();
+        $produk = produk::all();
 
-      if ($produk->kategori == 'saldo') {
-          $total = $request->jumlah + '2000';
-      } else {
-          $total = $request->jumlah * $produk->harga_jual;
-      }
+        // Hapus titik ribuan dari input jumlah
+        $jumlah = str_replace('.', '', $request->jumlah);
 
-      $penjualan->update([
-        'produk_id' => $request->produk_id,
-        'no' => $request->no,
-        'jumlah' => $request->jumlah,
-        'total' => $total,
-        'tanggal' => $request->tanggal,
-        'user_id' => $request->user_id
-      ]);
-      return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil diperbarui');
+        // Ambil produk berdasarkan produk_id dari request
+        $selectedProduct = produk::find($request->produk_id);
+
+        // Cek stok produk sebelum melakukan penjualan
+        if ($selectedProduct->stok < $jumlah) {
+            return redirect()->back()->with('toast_error', 'Stok produk tidak mencukupi untuk transaksi ini')->withInput();
+        }
+
+         // Hitung total berdasarkan kategori produk
+        if ($selectedProduct->kategori == 'saldo') {
+            $total = $jumlah + 2000;
+            // Kurangi stok untuk semua produk dengan kategori 'saldo'
+            produk::where('kategori', 'saldo')->increment('stok', $penjualan->jumlah); // Kembalikan stok sebelumnya
+            produk::where('kategori', 'saldo')->decrement('stok', $jumlah); // Kurangi stok baru
+        } else {
+            $total = $jumlah * $selectedProduct->harga_jual;
+            // Kurangi stok untuk produk yang bukan kategori 'saldo'
+            $selectedProduct->increment('stok', $penjualan->jumlah); // Kembalikan stok sebelumnya
+            $selectedProduct->decrement('stok', $jumlah); // Kurangi stok baru
+        }
+
+        // Simpan perubahan stok produk
+        $selectedProduct->save();
+
+        $penjualan->update([
+            'produk_id' => $request->produk_id,
+            'no' => $request->no,
+            'jumlah' => $jumlah,
+            'total' => $total,
+            'tanggal' => $request->tanggal,
+            'user_id' => Auth::id()
+        ]);
+        return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil diperbarui');
     }
 
     /**
@@ -107,10 +147,22 @@ class PenjualanController extends Controller
      */
     public function destroy($id)
     {
-      $penjualan = penjualan::findOrFail($id);
-      $penjualan->delete();
+        $penjualan = penjualan::findOrFail($id);
+        $penjualan->delete();
 
-      return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil dihapus.');
+        // Ambil produk yang terlibat dalam penjualan ini
+        $selectedProduct = produk::find($penjualan->produk_id);
+
+        // Kembalikan stok berdasarkan kategori produk pada transaksi yang dihapus
+        if ($selectedProduct->kategori == 'saldo') {
+            // Kembalikan stok untuk semua produk dengan kategori 'saldo'
+            produk::where('kategori', 'saldo')->increment('stok', $penjualan->jumlah);
+        } else {
+            // Kembalikan stok untuk produk yang bukan kategori 'saldo'
+            $selectedProduct->increment('stok', $penjualan->jumlah);
+        }
+
+        return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil dihapus.');
     }
 
     public function filter(Request $request)
@@ -170,17 +222,12 @@ class PenjualanController extends Controller
 
         $jumlahTotal = $penjualan->sum('total');
 
-        $pdf = PDF::loadView('penjualan.cetak', [
-            'penjualan' => $penjualan,
-            'user' => $user,
-            'produk' => $produk,
-            'jumlahTotal' => $jumlahTotal,
-            'jumlahPenjualan' => $jumlahPenjualan,
-            'tanggal_mulai' => $request->input('tanggal_mulai'),
-            'tanggal_akhir' => $request->input('tanggal_akhir'),
-            'nama_produk' => $request->input('nama_produk'),
-        ]);
+        $tanggal_mulai = $request->input('tanggal_mulai');
 
-        return $pdf->download('laporan-transaksi-penjualan.pdf');
+        $tanggal_akhir = $request->input('tanggal_akhir');
+
+        $nama_produk = $request->input('nama_produk');
+
+        return view('penjualan.cetak', compact('penjualan', 'user', 'produk', 'jumlahPenjualan', 'jumlahTotal', 'tanggal_mulai', 'tanggal_akhir', 'nama_produk'));
     }
 }

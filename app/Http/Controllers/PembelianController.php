@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Http\Requests\StorepembelianRequest;
 use App\Http\Requests\UpdatepembelianRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use PDF;
 
 class PembelianController extends Controller
@@ -39,23 +40,33 @@ class PembelianController extends Controller
      */
     public function store(StorepembelianRequest $request)
     {
-    //   $produk = produk::all();
+      $produk = produk::all();
       $user = User::all();
+      $produk = produk::all();
 
-      $produk = Produk::find($request->produk_id);
+      // Hapus titik ribuan dari input jumlah
+      $jumlah = str_replace('.', '', $request->jumlah);
 
-      if ($produk->kategori == 'saldo') {
-          $total = $request->jumlah;
+      // Ambil produk berdasarkan produk_id dari request
+      $selectedProduct = produk::find($request->produk_id);
+
+      // Hitung total berdasarkan kategori produk
+      if ($selectedProduct->kategori == 'saldo') {
+          $total = $jumlah;
+          // Tambah stok untuk semua produk dengan kategori 'saldo'
+          produk::where('kategori', 'saldo')->increment('stok', $jumlah);
       } else {
-          $total = $request->jumlah * $produk->harga_beli;
+          $total = $jumlah * $selectedProduct->harga_beli;
+          // Tambah stok untuk produk yang bukan kategori 'saldo'
+          $selectedProduct->increment('stok', $jumlah);
       }
 
       $pembelian = pembelian::create([
         'produk_id' => $request->produk_id,
-        'jumlah' => $request->jumlah,
+        'jumlah' => $jumlah,
         'total' => $total,
         'tanggal' => $request->tanggal,
-        'user_id' => $request->user_id
+        'user_id' => Auth::id()
       ]);
       return redirect()->route('pembelian')->with('toast_success', 'Transaksi berhasil ditambahkan');
     }
@@ -80,27 +91,42 @@ class PembelianController extends Controller
      */
     public function update(UpdatepembelianRequest $request, $id)
     {
-      $pembelian = pembelian::findOrFail($id);
-      $user = User::all();
+        $pembelian = pembelian::findOrFail($id);
+        $user = User::all();
+        $produk = produk::all();
 
-      $produk = Produk::find($request->produk_id);
+        // Hapus titik ribuan dari input jumlah
+        $jumlah = str_replace('.', '', $request->jumlah);
 
-      if ($produk->kategori == 'saldo') {
-          $total = $request->jumlah;
-      } else {
-          $total = $request->jumlah * $produk->harga_beli;
-      }
+        // Hapus titik ribuan dari input jumlah
+        $jumlah = str_replace('.', '', $request->jumlah);
 
-      $pembelian->update([
-        'produk_id' => $request->produk_id,
-        'jumlah' => $request->jumlah,
-        'total' => $total,
-        'tanggal' => $request->tanggal,
-        'user_id' => $request->user_id
-      ]);
+        // Ambil produk berdasarkan produk_id dari request
+        $selectedProduct = produk::find($request->produk_id);
 
-      return redirect()->route('pembelian')
-          ->with('toast_success', 'Transaksi berhasil diperbarui');
+        // Hitung total berdasarkan kategori produk
+        if ($selectedProduct->kategori == 'saldo') {
+            $total = $jumlah;
+            // Kembalikan stok untuk semua produk dengan kategori 'saldo'
+            produk::where('kategori', 'saldo')->decrement('stok', $pembelian->jumlah); // Kembalikan stok sebelumnya
+            produk::where('kategori', 'saldo')->increment('stok', $jumlah); // Tambah stok baru
+        } else {
+            $total = $jumlah * $selectedProduct->harga_beli;
+            // Kembalikan stok untuk produk yang bukan kategori 'saldo'
+            $selectedProduct->decrement('stok', $pembelian->jumlah); // Kembalikan stok sebelumnya
+            $selectedProduct->increment('stok', $jumlah); // Tambah stok baru
+        }
+
+        $pembelian->update([
+            'produk_id' => $request->produk_id,
+            'jumlah' => $jumlah,
+            'total' => $total,
+            'tanggal' => $request->tanggal,
+            'user_id' => Auth::id()
+        ]);
+
+        return redirect()->route('pembelian')
+            ->with('toast_success', 'Transaksi berhasil diperbarui');
     }
 
     /**
@@ -108,10 +134,22 @@ class PembelianController extends Controller
      */
     public function destroy($id)
     {
-      $pembelian = pembelian::findOrFail($id);
-      $pembelian->delete();
+        $pembelian = pembelian::findOrFail($id);
+        $pembelian->delete();
 
-      return redirect()->route('pembelian')->with('toast_success', 'Transaksi berhasil dihapus');
+        // Ambil produk yang terlibat dalam pembelian ini
+        $selectedProduct = produk::find($pembelian->produk_id);
+
+        // Tambah stok berdasarkan kategori produk pada transaksi yang dihapus
+        if ($selectedProduct->kategori == 'saldo') {
+            // Tambah stok untuk semua produk dengan kategori 'saldo'
+            produk::where('kategori', 'saldo')->decrement('stok', $pembelian->jumlah);
+        } else {
+            // Tambah stok untuk produk yang bukan kategori 'saldo'
+            $selectedProduct->decrement('stok', $pembelian->jumlah);
+        }
+
+        return redirect()->route('pembelian')->with('toast_success', 'Transaksi berhasil dihapus');
     }
 
     public function filter(Request $request)
@@ -171,17 +209,12 @@ class PembelianController extends Controller
 
         $jumlahTotal = $pembelian->sum('total');
 
-        $pdf = PDF::loadView('pembelian.cetak', [
-            'pembelian' => $pembelian,
-            'user' => $user,
-            'produk' => $produk,
-            'jumlahPembelian' => $jumlahPembelian,
-            'jumlahTotal' => $jumlahTotal,
-            'tanggal_mulai' => $request->input('tanggal_mulai'),
-            'tanggal_akhir' => $request->input('tanggal_akhir'),
-            'nama_produk' => $request->input('nama_produk'),
-        ]);
+        $tanggal_mulai = $request->input('tanggal_mulai');
 
-        return $pdf->download('laporan-transaksi-pembelian.pdf');
+        $tanggal_akhir = $request->input('tanggal_akhir');
+
+        $nama_produk = $request->input('nama_produk');
+
+        return view('pembelian.cetak', compact('pembelian', 'user', 'produk', 'jumlahPembelian', 'jumlahTotal', 'tanggal_mulai', 'tanggal_akhir', 'nama_produk'));
     }
 }

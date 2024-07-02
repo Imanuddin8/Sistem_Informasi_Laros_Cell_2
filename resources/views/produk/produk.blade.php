@@ -4,7 +4,7 @@
 <section class="content-header">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-12 col-md-8 col-lg-12">
         <h1>Produk</h1>
         <p>Daftar produk pada Toko Laros Cell</p>
       </div>
@@ -16,7 +16,7 @@
 <section class="content">
 <div class="container-fluid">
   <div class="row">
-    <div class="col-12">
+    <div class="col-12 col-md-8 col-lg-12">
       <div class="card">
         <div class="card-body">
             <div class="mb-4">
@@ -42,14 +42,14 @@
                             <td>{{$loop->iteration}}</td>
                             <td>{{$row->nama_produk}}</td>
                             <td>{{$row->kategori}}</td>
-                            <td>Rp {{$row->harga_beli}}</td>
-                            <td>Rp {{$row->harga_jual}}</td>
+                            <td>Rp {{number_format($row->harga_beli, 0, ',', '.')}}</td>
+                            <td>Rp {{number_format($row->harga_jual, 0, ',', '.')}}</td>
                             <td>{{number_format($row->stok, 0, ',', '.')}}</td>
                             <td class="d-flex">
                                 <a href="{{route('produk.edit', ['id' => $row->id])}}" type="button" class="btn btn-icon btn-warning mr-2" name="edit">
                                     <i class="text-white fa fa-edit" aria-hidden="true"></i>
                                 </a>
-                                <a href="{{route('produk.delete', ['id' => $row->id])}}}" type="button" class="btn btn-icon btn-danger" name="delete" onclick="if(!confirm('Yakin Akan Menghapus?')){return false}">
+                                <a href="{{route('produk.delete', ['id' => $row->id])}}}" type="button" class="btn btn-icon btn-danger" name="delete" onclick="if(!confirm('Apakah anda yakin akan Menghapus?')){return false}">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </a>
                             </td>
