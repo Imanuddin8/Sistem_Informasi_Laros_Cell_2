@@ -8,25 +8,34 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-  public function login()
-  {
-      return view('auth.login');
-  }
+    // Method untuk menampilkan halaman login
+    public function login()
+    {
+        return view('auth.login'); // Mengembalikan view 'auth.login'
+    }
 
-  public function loginAction(Request $request)
-  {
-      if (Auth::attempt($request->only('username', 'password'))) {
-          return redirect('/dashboard');
-      }
-      return redirect('/')->with('error', 'Username atau password yang anda masukkan salah');
-  }
+    // Method untuk menangani aksi login
+    public function loginAction(Request $request)
+    {
+        // Memeriksa kredensial pengguna (username dan password) yang diberikan
+        if (Auth::attempt($request->only('username', 'password'))) {
+            // Jika autentikasi berhasil, redirect ke halaman dashboard
+            return redirect('/dashboard');
+        }
+        // Jika autentikasi gagal, redirect kembali ke halaman utama dengan pesan error
+        return redirect('/')->with('error', 'Username atau password yang anda masukkan salah');
+    }
+    
+    // Method untuk menangani aksi logout
+    public function logout(Request $request)
+    {
+        // Mengeluarkan pengguna yang sedang login
+        Auth::guard('web')->logout();
 
-  public function logout(Request $request)
-  {
-      Auth::guard('web')->logout();
+        // Menginvalidate sesi pengguna
+        $request->session()->invalidate();
 
-      $request->session()->invalidate();
-
-      return redirect('/');
-  }
+        // Redirect ke halaman utama
+        return redirect('/');
+    }
 }

@@ -15,9 +15,12 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-      if(in_array($request->user()->role,$roles)){
-        return $next($request);
-      }
-      return redirect('/');
+        // Memeriksa apakah role pengguna yang sedang melakukan request termasuk dalam daftar role yang diizinkan
+        if (in_array($request->user()->role, $roles)) {
+            // Jika pengguna memiliki salah satu dari role yang diizinkan, maka lanjutkan request
+            return $next($request);
+        }
+        // Jika pengguna tidak memiliki salah satu dari role yang diizinkan, maka redirect ke halaman utama ('/')
+        return redirect('/');
     }
 }

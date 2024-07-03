@@ -14,61 +14,56 @@ class ProdukController extends Controller
      */
     public function index()
     {
+        // Mengambil semua data produk dan mengurutkannya berdasarkan waktu pembuatan secara descending (terbaru ke terlama)
         $produk = produk::orderBy('created_at', 'desc')->get();
+
+        // Mengembalikan view 'produk.produk' dengan data produk yang telah diambil
         return view('produk.produk', compact('produk'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-      $produk = produk::all();
-      return view('produk.create', compact('produk'));
+        // Mengambil semua data produk dari database
+        $produk = produk::all();
+
+        // Mengembalikan view 'produk.create' dengan data produk yang telah diambil
+        return view('produk.create', compact('produk'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreprodukRequest $request)
     {
         // Hapus titik ribuan dari input jumlah
         $harga_beli = str_replace('.', '', $request->harga_beli);
         $harga_jual = str_replace('.', '', $request->harga_jual);
 
+        // Menentukan nilai stok berdasarkan kategori produk.
         $stok = $request->kategori === 'saldo' ? Produk::where('nama_produk', 'saldo')->value('stok') : 0;
 
+        // Membuat entri baru dalam tabel `produk` dengan data yang diberikan dari request.
         $produk = produk::create([
-            'nama_produk' => $request->nama_produk,
-            'kategori' => $request->kategori,
-            'harga_beli' => $harga_beli,
-            'harga_jual' => $harga_jual,
-            'stok' => $stok,
+            'nama_produk' => $request->nama_produk, // Mengisi kolom 'nama_produk' dengan nilai dari request.
+            'kategori' => $request->kategori,       // Mengisi kolom 'kategori' dengan nilai dari request.
+            'harga_beli' => $harga_beli,            // Mengisi kolom 'harga_beli' dengan nilai variabel $harga_beli.
+            'harga_jual' => $harga_jual,            // Mengisi kolom 'harga_jual' dengan nilai variabel $harga_jual.
+            'stok' => $stok                        // Mengisi kolom 'stok' dengan nilai yang ditentukan sebelumnya.
         ]);
 
-        return redirect()->route('produk')
-            ->with('toast_success', 'Produk berhasil ditambahkan');
-        }
-
-    /**
-     * Display the specified resource.
-     */
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-      $produk = produk::findOrFail($id);
-      return view('produk.update', compact('produk'));
+        // Mengarahkan kembali ke route 'produk' dengan pesan sukses
+        return redirect()->route('produk')->with('toast_success', 'Produk berhasil ditambahkan');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    public function edit($id)
+    {
+        // Mengambil data produk berdasarkan ID yang diberikan.
+        $produk = produk::findOrFail($id);
+
+        // Mengembalikan view 'produk.update' dengan data produk yang telah diambil
+        return view('produk.update', compact('produk'));
+    }
+    
     public function update(UpdateprodukRequest $request, $id)
     {
+        // Mengambil data produk berdasarkan ID yang diberikan.
         $produk = produk::findOrFail($id);
 
         // Hapus titik ribuan dari input jumlah
@@ -89,25 +84,25 @@ class ProdukController extends Controller
 
         // Update data produk
         $produk->update([
-            'nama_produk' => $request->nama_produk,
-            'kategori' => $request->kategori,
-            'harga_beli' => $harga_beli,
-            'harga_jual' => $harga_jual,
-            'stok' => $produk->stok // stok tetap sama jika kategori tidak berubah
+            'nama_produk' => $request->nama_produk, // Mengisi kolom 'nama_produk' dengan nilai dari request.
+            'kategori' => $request->kategori,       // Mengisi kolom 'kategori' dengan nilai dari request.
+            'harga_beli' => $harga_beli,            // Mengisi kolom 'harga_beli' dengan nilai variabel $harga_beli.
+            'harga_jual' => $harga_jual,            // Mengisi kolom 'harga_jual' dengan nilai variabel $harga_jual.
+            'stok' => $produk->stok                 // stok tetap sama jika kategori tidak berubah
         ]);
 
-        return redirect()->route('produk')
-            ->with('toast_success', 'Produk berhasil diperbarui');
+        return redirect()->route('produk')->with('toast_success', 'Produk berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
+        // Mengambil data produk berdasarkan ID yang diberikan.
         $produk = produk::findOrFail($id);
+
+        // Menghapus data produk yang ditemukan dari database.
         $produk->delete();
 
+        // Mengarahkan ke route 'produk' dengan pesan sukses
         return redirect()->route('produk')->with('toast_success', 'Produk berhasil dihapus.');
     }
 }

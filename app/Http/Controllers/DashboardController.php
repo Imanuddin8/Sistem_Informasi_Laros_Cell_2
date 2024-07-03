@@ -7,76 +7,38 @@ use App\Models\penjualan;
 use App\Models\produk;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // $penjualan = penjualan::all();
+        // Mengambil semua data user dan produk
         $user = User::all();
         $produk = produk::all();
 
+        // Mengambil data produk dengan nama 'saldo'
         $saldoProduk = produk::where('nama_produk', 'saldo')->first();
+
+        // Jika produk dengan nama 'saldo' ada, ambil stoknya, jika tidak set stok menjadi 0
         $saldoStok = $saldoProduk ? $saldoProduk->stok : 0;
 
+        // Mengambil tanggal hari ini
         $today = Carbon::today();
-        $totalSales = penjualan::whereDate('tanggal', $today)->count();
 
+        // Mengambil data penjualan
+        $data = DB::table('penjualan')->get();
+
+        // Menghitung total penjualan hari ini
+        $totalSales = DB::table('penjualan')->whereDate('tanggal', $today)->count();
+
+        // Menghitung total jumlah user
         $jumlahUser = $user->count();
 
+        // Menghitung total jumlah produk
         $jumlahProduk = $produk->count();
 
-        return view('dashboard', compact('saldoStok', 'totalSales', 'jumlahUser', 'jumlahProduk'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        // Mengembalikan view 'dashboard' dengan data yang telah dihitung
+        return view('dashboard', compact('saldoStok', 'totalSales', 'jumlahUser', 'jumlahProduk', 'data'));
     }
 }

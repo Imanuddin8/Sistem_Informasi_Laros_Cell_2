@@ -18,10 +18,15 @@ class PenjualanController extends Controller
      */
     public function index()
     {
-      $penjualan = penjualan::orderBy('created_at', 'desc')->get();
-      $produk = produk::all();
-      $user = User::all();
-      return view('penjualan.penjualan', compact('penjualan', 'produk', 'user'));
+        // Mengambil semua data penjualan dan mengurutkannya berdasarkan waktu pembuatan secara descending (terbaru ke terlama)
+        $penjualan = penjualan::orderBy('created_at', 'desc')->get();
+
+        // Mengambil semua data produk dan user dari database
+        $produk = produk::all();
+        $user = User::all();
+
+        // Mengembalikan view 'penjualan.penjualan' dengan data penjualan, produk, dan user yang telah diambil
+        return view('penjualan.penjualan', compact('penjualan', 'produk', 'user'));
     }
 
     /**
@@ -29,18 +34,18 @@ class PenjualanController extends Controller
      */
     public function create()
     {
-      $penjualan = penjualan::all();
-      $produk = produk::all();
-      $user = User::all();
-      return view('penjualan.create', compact('penjualan', 'produk', 'user'));
-    }
+        // Mengambil semua data penjualan, produk, dan user dari database
+        $penjualan = penjualan::all();
+        $produk = produk::all();
+        $user = User::all();
 
-    /**
-     * Store a newly created resource in storage.
-     */
+        // Mengembalikan view 'penjualan.create' dengan data produk, penjualan, dan user yang telah diambil
+        return view('penjualan.create', compact('penjualan', 'produk', 'user'));
+    }
+    
     public function store(StorepenjualanRequest $request)
     {
-        $produk = produk::all();
+        // Mengambil semua data produk dan user dari database
         $user = User::all();
         $produk = produk::all();
 
@@ -70,37 +75,37 @@ class PenjualanController extends Controller
         $selectedProduct->save();
 
         $penjualan = penjualan::create([
-            'produk_id' => $request->produk_id,
-            'no' => $request->no,
-            'jumlah' => $jumlah,
-            'total' => $total,
-            'tanggal' => $request->tanggal,
-            'user_id' => Auth::id()
+            'produk_id' => $request->produk_id, // Menyimpan produk_id yang dikirim melalui request
+            'no' => $request->no,               // Menyimpan no penjualan yang dikirim melalui request
+            'jumlah' => $jumlah,                // Menyimpan jumlah penjualan yang telah diproses sebelumnya
+            'total' => $total,                  // Menyimpan total harga penjualan yang telah dihitung sebelumnya
+            'tanggal' => $request->tanggal,     // Menyimpan tanggal penjualan yang dikirim melalui request
+            'user_id' => Auth::id()             // Menyimpan user_id dari pengguna yang sedang login
         ]);
+
+        // Mengarahkan kembali ke route 'penjualan' dengan pesan sukses
         return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
-      $penjualan = penjualan::findOrFail($id);
-      $user = User::all();
-      $produk = produk::all();
-      return view('penjualan.update', compact('produk','penjualan', 'user'));
+        // Mengambil data penjualan berdasarkan ID yang diberikan.
+        $penjualan = penjualan::findOrFail($id);
+
+        // Mengambil semua data produk dan user dari database.
+        $user = User::all();
+        $produk = produk::all();
+
+        // Mengembalikan view 'penjualan.update' dengan variabel 'produk', 'penjualan', dan 'user'.
+        return view('penjualan.update', compact('produk','penjualan', 'user'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdatepenjualanRequest $request, $id)
     {
+        // Mengambil data penjualan berdasarkan ID yang diberikan.
         $penjualan = penjualan::findOrFail($id);
+
+        // Mengambil semua data produk dan user dari database.
         $user = User::all();
         $produk = produk::all();
 
@@ -131,23 +136,26 @@ class PenjualanController extends Controller
         // Simpan perubahan stok produk
         $selectedProduct->save();
 
+        // Mengupdate data penjualan di database dengan menggunakan model penjualan
         $penjualan->update([
-            'produk_id' => $request->produk_id,
-            'no' => $request->no,
-            'jumlah' => $jumlah,
-            'total' => $total,
-            'tanggal' => $request->tanggal,
-            'user_id' => Auth::id()
+            'produk_id' => $request->produk_id, // Menyimpan produk_id yang dikirim melalui request
+            'no' => $request->no,               // Menyimpan no penjualan yang dikirim melalui request
+            'jumlah' => $jumlah,                // Menyimpan jumlah penjualan yang telah diproses sebelumnya
+            'total' => $total,                  // Menyimpan total harga penjualan yang telah dihitung sebelumnya
+            'tanggal' => $request->tanggal,     // Menyimpan tanggal penjualan yang dikirim melalui request
+            'user_id' => Auth::id()             // Menyimpan user_id dari pengguna yang sedang login
         ]);
+
+        // Mengarahkan kembali ke route 'penjualan' dengan pesan sukses
         return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
+        // Mengambil data penjualan berdasarkan ID yang diberikan.
         $penjualan = penjualan::findOrFail($id);
+
+        // Menghapus data penjualan yang ditemukan dari database.
         $penjualan->delete();
 
         // Ambil produk yang terlibat dalam penjualan ini
@@ -162,11 +170,13 @@ class PenjualanController extends Controller
             $selectedProduct->increment('stok', $penjualan->jumlah);
         }
 
+        // Mengarahkan ke route 'penjualan' dengan pesan sukses
         return redirect()->route('penjualan')->with('toast_success', 'Transaksi berhasil dihapus.');
     }
 
     public function filter(Request $request)
     {
+        // Membuat instance query builder dari model `penjualan`.
         $query = penjualan::query();
 
         // Filter by nama_produk
@@ -186,8 +196,10 @@ class PenjualanController extends Controller
             $query->whereDate('tanggal', '<=', $request->input('tanggal_akhir'));
         }
 
+        // Menjalankan query yang telah dibangun menggunakan query builder dan mengambil semua hasilnya.
         $penjualan = $query->get();
 
+        // Mengarahkan ke route 'penjualan'
         return view('penjualan.penjualan', compact('penjualan'));
     }
 
@@ -197,6 +209,7 @@ class PenjualanController extends Controller
         $produk = produk::all();
         $user = User::all();
 
+        // Membuat instance query builder dari model `penjualan`.
         $query = penjualan::query();
 
         // Filter by nama_produk
@@ -216,18 +229,25 @@ class PenjualanController extends Controller
             $query->whereDate('tanggal', '<=', $request->input('tanggal_akhir'));
         }
 
+        // Menjalankan query yang telah dibangun menggunakan query builder dan mengambil semua hasilnya.
         $penjualan = $query->get();
 
+        // Menghitung jumlah transaksi penjualan
         $jumlahPenjualan = $penjualan->count();
 
+        // Menghitung jumlah total
         $jumlahTotal = $penjualan->sum('total');
 
+        // Input tanggal mulai
         $tanggal_mulai = $request->input('tanggal_mulai');
 
+        // Input tanggal akhir
         $tanggal_akhir = $request->input('tanggal_akhir');
 
+        // Iput nama produk
         $nama_produk = $request->input('nama_produk');
 
+        // Mengarahkan ke route 'penjualan.cetak' untuk di cetak
         return view('penjualan.cetak', compact('penjualan', 'user', 'produk', 'jumlahPenjualan', 'jumlahTotal', 'tanggal_mulai', 'tanggal_akhir', 'nama_produk'));
     }
 }
