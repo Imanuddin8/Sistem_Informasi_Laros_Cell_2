@@ -24,7 +24,7 @@
         <div>
             <p>Tanggal : {{ formatDate($tanggal_mulai) }} sd {{ formatDate($tanggal_akhir) }}</p>
             <p>Produk : {{ $nama_produk ? $nama_produk : 'Semua produk'}}</p>
-            <p>Jumlah transaksi penjualan: {{ number_format($jumlahPembelian, 0, ',', '.') }}</p>
+            <p>Jumlah transaksi penjualan : {{ number_format($jumlahPembelian, 0, ',', '.') }}</p>
             <p>Jumlah total : Rp {{ number_format($jumlahTotal, 0, ',', '.') }}</p>
         </div>
         <table>
