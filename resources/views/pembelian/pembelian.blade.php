@@ -42,19 +42,19 @@
                             <span class="fw-bold">Filter</span>
                         </div>
                         <div class="col-auto">
-                            <input class="form-control" required type="date" name="tanggal_mulai">
+                            <input class="form-control" required type="date" name="tanggal_mulai" title="tanggal awal">
                         </div>
                         <div class="col-auto">
                             -
                         </div>
                         <div class="col-auto">
-                            <input class="form-control" required type="date" name="tanggal_akhir">
+                            <input class="form-control" required type="date" name="tanggal_akhir" title="tanggal akhir">
                         </div>
                         <div class="col-auto">
                             /
                         </div>
                         <div class="col-auto">
-                            <input class="form-control" type="text" placeholder="Masukkan nama produk" name="nama_produk">
+                            <input class="form-control" type="text" placeholder="Masukkan nama produk" name="nama_produk" title="nama produk">
                         </div>
                         <div class="col-auto">
                             <button type="submit" class="btn btn-icon btn-success">

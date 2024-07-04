@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Transaksi</title>
+    <title>Laporan Transaksi Pembelian</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         table {
@@ -24,7 +24,8 @@
         <div>
             <p>Tanggal : {{ formatDate($tanggal_mulai) }} sd {{ formatDate($tanggal_akhir) }}</p>
             <p>Produk : {{ $nama_produk ? $nama_produk : 'Semua produk'}}</p>
-            <p>Jumlah transaksi pembelian: {{ $jumlahPembelian }}</p>
+            <p>Jumlah transaksi penjualan: {{ number_format($jumlahPembelian, 0, ',', '.') }}</p>
+            <p>Jumlah total : Rp {{ number_format($jumlahTotal, 0, ',', '.') }}</p>
         </div>
         <table>
             <thead class="text-center">
@@ -32,9 +33,9 @@
                 <th>No</th>
                 <th>Nama Produk</th>
                 <th>Jumlah</th>
+                <th>Total</th>
                 <th>Tanggal</th>
                 <th>Pembuat</th>
-                <th>Total</th>
             </tr>
             </thead>
             <tbody class="text-start">
@@ -50,19 +51,13 @@
                             <td>{{$loop->iteration}}</td>
                             <td>{{$row->produk->nama_produk}}</td>
                             <td>{{number_format($row->jumlah, 0, ',', '.')}}</td>
+                            <td>Rp {{number_format($row->total, 0, ',', '.')}}</td>
                             <td>{{formatDate($row->tanggal)}}</td>
                             <td>{{$row->user->username}}</td>
-                            <td>Rp {{number_format($row->total, 0, ',', '.')}}</td>
                         </tr>
                     @endforeach
                 @endif
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5" class="text-center">Jumlah total</td>
-                    <td>Rp {{ number_format($jumlahTotal, 0, ',', '.') }}</td>
-                </tr>
-            </tfoot>
         </table>
     </div>
 
